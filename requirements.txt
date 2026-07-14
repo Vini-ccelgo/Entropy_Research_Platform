@@ -1,0 +1,15 @@
+httpx>=0.27
+pydantic>=2.0
+python-dotenv>=1.0
+sqlalchemy>=2.0
+alembic>=1.13
+numpy
+pandas
+scipy
+scikit-learn
+sentence-transformers
+matplotlib
+plotly
+tqdm
+rich
+typer
