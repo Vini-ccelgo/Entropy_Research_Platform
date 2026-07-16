@@ -22,3 +22,6 @@ class QrngEntropySource(EntropySource):
 
     def read_bytes(self, count: int) -> bytes:
         return self._fetch_bytes(count)
+
+    def provenance_configuration(self) -> dict[str, object]:
+        return {"provider": self._provider, "replayable": False}

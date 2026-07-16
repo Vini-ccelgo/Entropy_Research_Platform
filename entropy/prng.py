@@ -18,3 +18,9 @@ class PrngEntropySource(EntropySource):
 
     def read_bytes(self, count: int) -> bytes:
         return self._random.randbytes(count)
+
+    def provenance_configuration(self) -> dict[str, object]:
+        return {"algorithm": "python.random.Random", "seed": self._seed}
+
+    def capabilities(self) -> dict[str, int | bool | str]:
+        return {"max_bytes_per_request": 1_048_576, "replayable": True}

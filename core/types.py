@@ -199,6 +199,7 @@ class TrialSpec(FrozenModel):
     model_provider: str
     model_identifier: str
     entropy: EntropyRequest
+    entropy_policy: "EntropyPolicyReference"
     temperature: float = Field(default=0.7, ge=0, le=2)
     top_p: float = Field(default=0.95, gt=0, le=1)
     top_k: int | None = Field(default=None, ge=1)
@@ -251,3 +252,6 @@ class Observation(FrozenModel):
     tags: tuple[str, ...] = ()
     notes: str | None = None
     recorded_at: datetime = Field(default_factory=utc_now)
+
+from entropy.policy import EntropyPolicyReference
+TrialSpec.model_rebuild()

@@ -43,3 +43,21 @@ hash and provenance.
 
 See [the architecture guide](docs/architecture.md) for the component, class,
 sequence, and database diagrams.
+
+The [reproducibility contract](docs/reproducibility-contract.md) defines the
+immutable execution provenance required for every recorded trial.
+
+The [control-plane model](docs/control-plane.md) defines explicit operational
+lifecycle, retries, idempotency, and the separation from scientific evidence.
+
+The [Entropy Policy System](docs/entropy-policy-system.md) documents the
+registered, seed-only entropy transformation used by current trials.
+
+The [technical specification](docs/technical-specification.md) is the canonical
+reference for the currently implemented platform.
+
+The [Evidence and Analysis Plane](docs/evidence-and-analysis.md) documents the
+implemented deterministic baseline analysis subsystem.
+
+The `analysis`, `api`, `dashboard`, `reports`, and non-LM-Studio provider
+directories are deferred placeholders; they are not implemented subsystems.

@@ -7,19 +7,24 @@ from typing import Iterable
 from uuid import UUID
 
 from core.types import (
-    EntropyRequest, EntropySample, ExperimentPlan, Hypothesis,
+    EntropyRequest, EntropySample, Hypothesis,
     HypothesisReference, ModelRequest, ModelResponse, Observation,
     PromptTemplate, RenderedPrompt, TrialResult,
 )
 from core.science import (
-    AuditEvent, BeliefAssessment, Claim, ExternalReference, JournalEntry,
+    AuditEvent, BeliefAssessment, Claim, ExperimentRevision, ExternalReference, JournalEntry,
     ResearchQuestion, ScientificRecordReference, ScientificRelation,
 )
+from core.provenance import EntropySourceSnapshot, ModelSnapshot, TrialExecution
+from core.control import ControlEvent, ExperimentRun, ExperimentRunState, TrialAttempt, TrialAttemptState
 
 
 class EntropyPort(ABC):
     @abstractmethod
     def sample(self, request: EntropyRequest) -> EntropySample: ...
+
+    @abstractmethod
+    def provenance_snapshot(self) -> EntropySourceSnapshot: ...
 
 
 class PromptRendererPort(ABC):
@@ -34,19 +39,16 @@ class ModelProviderPort(ABC):
     @abstractmethod
     def capabilities(self) -> dict[str, object]: ...
 
+    @abstractmethod
+    def provenance_snapshot(self, model_identifier: str) -> ModelSnapshot: ...
+
 
 class ExperimentRepositoryPort(ABC):
-    @abstractmethod
-    def create_experiment(self, plan: ExperimentPlan) -> None: ...
-
-    @abstractmethod
-    def record_trial(self, result: TrialResult) -> None: ...
-
     @abstractmethod
     def record_observation(self, observation: Observation) -> None: ...
 
     @abstractmethod
-    def trials_for_experiment(self, experiment_id: UUID) -> Iterable[TrialResult]: ...
+    def trials_for_experiment(self, experiment: ScientificRecordReference) -> Iterable[TrialExecution]: ...
 
 
 class HypothesisRegistryPort(ABC):
@@ -73,6 +75,9 @@ class ScientificRecordRepositoryPort(ABC):
     def register_external_reference(self, reference: ExternalReference) -> ScientificRecordReference: ...
 
     @abstractmethod
+    def register_experiment_revision(self, experiment: ExperimentRevision) -> ScientificRecordReference: ...
+
+    @abstractmethod
     def register_hypothesis(
         self, hypothesis: Hypothesis, motivated_by: tuple[ScientificRecordReference, ...] = (),
     ) -> ScientificRecordReference: ...
@@ -88,3 +93,25 @@ class ScientificRecordRepositoryPort(ABC):
 
     @abstractmethod
     def append_audit_event(self, event: AuditEvent) -> None: ...
+
+class ControlRepositoryPort(ABC):
+    @abstractmethod
+    def create_run(self, run: ExperimentRun, event: ControlEvent) -> ExperimentRun: ...
+    @abstractmethod
+    def find_run_by_key(self, key: str) -> ExperimentRun | None: ...
+    @abstractmethod
+    def get_run(self, run_id: UUID) -> ExperimentRun: ...
+    @abstractmethod
+    def transition_run(self, run_id: UUID, state: ExperimentRunState, event: ControlEvent) -> ExperimentRun: ...
+    @abstractmethod
+    def create_attempt(self, attempt: TrialAttempt, event: ControlEvent) -> TrialAttempt: ...
+    @abstractmethod
+    def transition_attempt(self, attempt_id: UUID, state: TrialAttemptState, event: ControlEvent,
+                           error_category=None, error_message: str | None=None) -> TrialAttempt: ...
+    @abstractmethod
+    def attempts_for_run(self, run_id: UUID) -> Iterable[TrialAttempt]: ...
+    @abstractmethod
+    def append_control_event(self, event: ControlEvent) -> None: ...
+    @abstractmethod
+    def finalize_attempt(self, execution: TrialExecution, state: TrialAttemptState,
+                         event: ControlEvent, error_category=None, error_message: str | None = None) -> TrialAttempt: ...

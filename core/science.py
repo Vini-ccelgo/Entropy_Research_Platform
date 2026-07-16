@@ -14,7 +14,9 @@ from uuid import UUID, uuid4
 
 from pydantic import Field, HttpUrl, field_validator
 
-from core.types import FrozenModel, HypothesisSpecification, ObserverKind, utc_now
+from core.types import (
+    ExperimentPlan, FrozenModel, HypothesisSpecification, ObserverKind, utc_now,
+)
 
 
 def _content_hash(value: FrozenModel, excluded: set[str]) -> str:
@@ -141,6 +143,26 @@ class ExternalReference(RevisionedScientificRecord):
     @property
     def record_type(self) -> ScientificRecordType:
         return ScientificRecordType.EXTERNAL_REFERENCE
+
+
+class ExperimentRevision(RevisionedScientificRecord):
+    """The registered, immutable experiment definition that trials execute."""
+
+    name: str = Field(min_length=1, max_length=240)
+    description: str = ""
+    plan: ExperimentPlan
+
+    @property
+    def record_type(self) -> ScientificRecordType:
+        return ScientificRecordType.EXPERIMENT
+
+    @classmethod
+    def from_plan(cls, plan: ExperimentPlan, created_by: UUID) -> "ExperimentRevision":
+        """Promote an in-memory construction plan to its first registered revision."""
+        return cls(
+            id=plan.id, name=plan.name, description=plan.description,
+            plan=plan, created_by=created_by,
+        )
 
 
 class ScientificRelation(FrozenModel):

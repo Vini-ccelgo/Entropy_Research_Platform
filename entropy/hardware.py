@@ -14,3 +14,6 @@ class OperatingSystemEntropySource(EntropySource):
 
     def read_bytes(self, count: int) -> bytes:
         return os.urandom(count)
+
+    def provenance_configuration(self) -> dict[str, object]:
+        return {"api": "os.urandom", "replayable": False}

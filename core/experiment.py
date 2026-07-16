@@ -1,11 +1,12 @@
-"""Experiment aggregate compatibility module.
+"""Experiment aggregate public types.
 
-The immutable :class:`ExperimentPlan` is the experiment definition; execution
-is owned by the application-layer trial orchestrator.
+``ExperimentPlan`` is an in-memory construction DTO. ``ExperimentRevision``
+is the sole registered, persisted experiment definition.
 """
 
+from core.science import ExperimentRevision
 from core.types import ExperimentPlan
 
-Experiment = ExperimentPlan
+Experiment = ExperimentRevision
 
-__all__ = ["Experiment", "ExperimentPlan"]
+__all__ = ["Experiment", "ExperimentPlan", "ExperimentRevision"]
