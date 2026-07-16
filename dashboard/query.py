@@ -1,0 +1,36 @@
+"""Read-only projections for the Investigation Workspace."""
+from __future__ import annotations
+import json
+import sqlite3
+from pathlib import Path
+
+class WorkspaceQuery:
+    def __init__(self,database:Path)->None:
+        self.connection=sqlite3.connect(database); self.connection.row_factory=sqlite3.Row
+    def context(self)->dict:
+        return {"questions":self._records("research_questions"),"hypotheses":self._records("hypotheses"),"experiments":self._records("experiment_revisions"),"analyses":self._records("analysis_specifications")}
+    def evidence(self,experiment_id:str|None=None)->dict:
+        sql="SELECT payload_json FROM trial_executions"+(" WHERE experiment_id=?" if experiment_id else "")
+        rows=self.connection.execute(sql,(experiment_id,) if experiment_id else ()).fetchall()
+        executions=[json.loads(r["payload_json"]) for r in rows]
+        return {"executions":executions,"count":len(executions),"disclosure":"Read-only persisted evidence; descriptive results do not assert scientific conclusions."}
+    def provenance(self,kind:str,identifier:str,revision:int|None=None)->dict|None:
+        tables={"question":"research_questions","hypothesis":"hypotheses","experiment":"experiment_revisions","analysis":"analysis_specifications"}
+        table=tables.get(kind)
+        if not table:return None
+        query=f"SELECT payload_json,content_hash FROM {table} WHERE id=?"+(" AND revision=?" if revision else "")+" ORDER BY revision DESC LIMIT 1"
+        row=self.connection.execute(query,(identifier,revision) if revision else (identifier,)).fetchone()
+        return {"record":json.loads(row["payload_json"]),"content_hash":row["content_hash"]} if row else None
+    def graph(self)->dict:
+        nodes=[]; edges=[]
+        for table,kind in (("research_questions","question"),("hypotheses","hypothesis"),("experiment_revisions","experiment"),("journal_entries","journal"),("claims","claim")):
+            for item in self._records(table): nodes.append({"id":f"{kind}:{item['id']}:{item.get('revision',1)}","type":kind,"label":item.get("title") or item.get("name") or item.get("question") or item.get("statement") or kind})
+        for row in self.connection.execute("SELECT payload_json FROM scientific_relations"):
+            relation=json.loads(row["payload_json"]); s=relation["source"];t=relation["target"]
+            edges.append({"source":f"{s['record_type']}:{s['record_id']}:{s['revision']}","target":f"{t['record_type']}:{t['record_id']}:{t['revision']}","type":relation["relation_type"]})
+        return {"nodes":nodes,"edges":edges}
+    def journal(self)->list[dict]: return self._records("journal_entries")
+    def artifacts(self,run_id:str)->list[dict]:
+        row=self.connection.execute("SELECT payload_json FROM analysis_results WHERE run_id=? ORDER BY rowid DESC LIMIT 1",(run_id,)).fetchone()
+        return json.loads(row["payload_json"]).get("artifacts",[]) if row else []
+    def _records(self,table:str)->list[dict]: return [json.loads(r["payload_json"]) for r in self.connection.execute(f"SELECT payload_json FROM {table} ORDER BY rowid")]

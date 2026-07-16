@@ -59,5 +59,8 @@ reference for the currently implemented platform.
 The [Evidence and Analysis Plane](docs/evidence-and-analysis.md) documents the
 implemented deterministic baseline analysis subsystem.
 
+The [Investigation Workspace](docs/investigation-workspace.md) documents the
+read-only, evidence-oriented workspace skeleton.
+
 The `analysis`, `api`, `dashboard`, `reports`, and non-LM-Studio provider
 directories are deferred placeholders; they are not implemented subsystems.
