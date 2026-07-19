@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+import json
 from collections.abc import Iterable
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -16,6 +17,10 @@ from core.provenance import TrialExecution
 from entropy.policy import EntropyPolicySpecification, EntropyPolicyReference
 from analysis.domain import AnalysisSpecification, AnalysisRun, AnalysisResult, CohortSnapshot
 from core.types import Hypothesis, HypothesisReference, Observation
+from core.registries import (
+    EntropySourceReference, EntropySourceSpecification, PromptRevision,
+    PromptRevisionReference, PromptSetReference, PromptSetRevision,
+)
 
 
 class SqliteRepository(ExperimentRepositoryPort, HypothesisRegistryPort, ScientificRecordRepositoryPort, ControlRepositoryPort):
@@ -155,6 +160,27 @@ class SqliteRepository(ExperimentRepositoryPort, HypothesisRegistryPort, Scienti
             content_hash=experiment.plan.hypothesis.content_hash,
         )
         self.resolve(hypothesis)
+        plan = experiment.plan
+        if plan.conditions:
+            self.resolve_prompt_set(plan.prompt_set)
+            seen_sources: set[tuple[str, str]] = set()
+            source_kinds: list[str] = []
+            for condition in plan.conditions:
+                source = self.resolve_entropy_source(condition.entropy_source)
+                self.resolve_entropy_policy(condition.entropy_policy)
+                key = (source.implementation_identity, json.dumps(source.configuration, sort_keys=True))
+                if key in seen_sources:
+                    raise ValueError("equivalent entropy sources cannot define distinct conditions")
+                seen_sources.add(key)
+                source_kinds.append(source.source_type)
+            if source_kinds.count("deterministic_prng") != 1:
+                raise ValueError("exactly one deterministic PRNG control condition is required")
+            if not any(kind in {"os_entropy", "hardware_entropy", "qrng"} for kind in source_kinds):
+                raise ValueError("at least one approved nondeterministic physical-entropy condition is required")
+            for trial in plan.trials:
+                self.resolve_prompt(trial.prompt_revision)
+                self.resolve_entropy_source(trial.entropy_source)
+                self.resolve_entropy_policy(trial.entropy_policy)
         reference = experiment.reference()
         hypothesis_reference = ScientificRecordReference(
             record_type="hypothesis", record_id=hypothesis.hypothesis_id,
@@ -264,6 +290,70 @@ class SqliteRepository(ExperimentRepositoryPort, HypothesisRegistryPort, Scienti
     def append_audit_event(self, event: AuditEvent) -> None:
         with self._connection:
             self._write_audit(event)
+
+    def _register_input(self, table: str, spec, reference, subject_type: str):
+        """Persist a revision and its append-only registration audit together."""
+        with self._connection:
+            self._connection.execute(
+                f"INSERT INTO {table} VALUES (?, ?, ?, ?)",
+                (str(reference[0]), reference[1], reference[2], spec.model_dump_json()),
+            )
+            self._connection.execute(
+                "INSERT INTO audit_events VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (str(uuid4()), "registered", subject_type, str(reference[0]), reference[1],
+                 str(spec.created_by), spec.created_at.isoformat(),
+                 json.dumps({"content_hash": reference[2]}, sort_keys=True)),
+            )
+
+    def register_entropy_source(self, spec: EntropySourceSpecification) -> EntropySourceReference:
+        if spec.revision == 1:
+            if spec.predecessor is not None: raise ValueError("first source revision cannot have a predecessor")
+        elif spec.predecessor is None or spec.predecessor.source_id != spec.id or spec.predecessor.revision != spec.revision - 1:
+            raise ValueError("source revisions must pin their immediate predecessor")
+        elif self.resolve_entropy_source(spec.predecessor) is None: raise ValueError("source predecessor cannot be resolved")
+        ref = EntropySourceReference(source_id=spec.id, revision=spec.revision, content_hash=spec.content_hash())
+        self._register_input("entropy_source_specifications", spec, (ref.source_id, ref.revision, ref.content_hash), "entropy_source")
+        return ref
+
+    def resolve_entropy_source(self, ref: EntropySourceReference) -> EntropySourceSpecification:
+        row = self._connection.execute("SELECT payload_json, content_hash FROM entropy_source_specifications WHERE id=? AND revision=?", (str(ref.source_id), ref.revision)).fetchone()
+        if not row or row["content_hash"] != ref.content_hash:
+            raise KeyError("pinned entropy source cannot be resolved")
+        return EntropySourceSpecification.model_validate_json(row["payload_json"])
+
+    def register_prompt(self, prompt: PromptRevision) -> PromptRevisionReference:
+        if prompt.revision == 1:
+            if prompt.predecessor is not None: raise ValueError("first prompt revision cannot have a predecessor")
+        elif prompt.predecessor is None or prompt.predecessor.prompt_id != prompt.id or prompt.predecessor.revision != prompt.revision - 1:
+            raise ValueError("prompt revisions must pin their immediate predecessor")
+        elif self.resolve_prompt(prompt.predecessor) is None: raise ValueError("prompt predecessor cannot be resolved")
+        ref = PromptRevisionReference(prompt_id=prompt.id, revision=prompt.revision, content_hash=prompt.content_hash())
+        self._register_input("prompt_revisions", prompt, (ref.prompt_id, ref.revision, ref.content_hash), "prompt")
+        return ref
+
+    def resolve_prompt(self, ref: PromptRevisionReference) -> PromptRevision:
+        row = self._connection.execute("SELECT payload_json, content_hash FROM prompt_revisions WHERE id=? AND revision=?", (str(ref.prompt_id), ref.revision)).fetchone()
+        if not row or row["content_hash"] != ref.content_hash:
+            raise KeyError("pinned prompt revision cannot be resolved")
+        return PromptRevision.model_validate_json(row["payload_json"])
+
+    def register_prompt_set(self, prompt_set: PromptSetRevision) -> PromptSetReference:
+        if prompt_set.revision == 1:
+            if prompt_set.predecessor is not None: raise ValueError("first prompt-set revision cannot have a predecessor")
+        elif prompt_set.predecessor is None or prompt_set.predecessor.prompt_set_id != prompt_set.id or prompt_set.predecessor.revision != prompt_set.revision - 1:
+            raise ValueError("prompt-set revisions must pin their immediate predecessor")
+        elif self.resolve_prompt_set(prompt_set.predecessor) is None: raise ValueError("prompt-set predecessor cannot be resolved")
+        for prompt in prompt_set.prompts:
+            self.resolve_prompt(prompt)
+        ref = PromptSetReference(prompt_set_id=prompt_set.id, revision=prompt_set.revision, content_hash=prompt_set.content_hash())
+        self._register_input("prompt_set_revisions", prompt_set, (ref.prompt_set_id, ref.revision, ref.content_hash), "prompt_set")
+        return ref
+
+    def resolve_prompt_set(self, ref: PromptSetReference) -> PromptSetRevision:
+        row = self._connection.execute("SELECT payload_json, content_hash FROM prompt_set_revisions WHERE id=? AND revision=?", (str(ref.prompt_set_id), ref.revision)).fetchone()
+        if not row or row["content_hash"] != ref.content_hash:
+            raise KeyError("pinned prompt set cannot be resolved")
+        return PromptSetRevision.model_validate_json(row["payload_json"])
     def register_entropy_policy(self,spec:EntropyPolicySpecification)->EntropyPolicyReference:
         ref=EntropyPolicyReference(policy_id=spec.id,revision=spec.revision,content_hash=spec.content_hash())
         with self._connection:
@@ -284,6 +374,10 @@ class SqliteRepository(ExperimentRepositoryPort, HypothesisRegistryPort, Scienti
             row=self._connection.execute("SELECT payload_json FROM trial_executions WHERE id=?",(str(member.execution_id),)).fetchone()
             if row: result.append(TrialExecution.model_validate_json(row["payload_json"]))
         return result
+    def executions_for_run(self, run_id: UUID):
+        rows = self._connection.execute("SELECT payload_json FROM trial_executions ORDER BY started_at").fetchall()
+        return [execution for row in rows
+                if (execution := TrialExecution.model_validate_json(row["payload_json"])).experiment_run_id == run_id]
     def finalize_analysis_run(self,run:AnalysisRun,result:AnalysisResult)->None:
         with self._connection:
             self._connection.execute("UPDATE analysis_runs SET status=? WHERE id=?",(result.status,str(run.id)))
@@ -333,6 +427,19 @@ class SqliteRepository(ExperimentRepositoryPort, HypothesisRegistryPort, Scienti
         return new
     def attempts_for_run(self,run_id:UUID)->Iterable[TrialAttempt]:
         return [TrialAttempt.model_validate_json(r["payload_json"]) for r in self._connection.execute("SELECT payload_json FROM trial_attempts WHERE experiment_run_id=? ORDER BY rowid",(str(run_id),))]
+    def successful_trial_specs(self, run_id: UUID) -> set[UUID]:
+        return {attempt.trial_spec_id for attempt in self.attempts_for_run(run_id)
+                if attempt.state is TrialAttemptState.SUCCEEDED}
+    def successful_execution_for_trial_spec(self, run_id: UUID, trial_spec_id: UUID) -> TrialExecution | None:
+        rows = self._connection.execute(
+            "SELECT payload_json FROM trial_executions WHERE trial_spec_id=? AND status='completed' ORDER BY started_at",
+            (str(trial_spec_id),),
+        ).fetchall()
+        for row in rows:
+            execution = TrialExecution.model_validate_json(row["payload_json"])
+            if execution.experiment_run_id == run_id:
+                return execution
+        return None
     def append_control_event(self,event:ControlEvent)->None:
         with self._connection: self._control_event(event)
     def finalize_attempt(self,execution:TrialExecution,state:TrialAttemptState,event:ControlEvent,error_category=None,error_message:str|None=None)->TrialAttempt:

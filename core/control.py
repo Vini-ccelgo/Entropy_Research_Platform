@@ -47,8 +47,8 @@ class ControlEvent(FrozenModel):
 RUN_TRANSITIONS={
  ExperimentRunState.SCHEDULED:{ExperimentRunState.RUNNING,ExperimentRunState.CANCELLED},
  ExperimentRunState.RUNNING:{ExperimentRunState.PAUSED,ExperimentRunState.COMPLETED,ExperimentRunState.FAILED,ExperimentRunState.CANCELLED},
- ExperimentRunState.PAUSED:{ExperimentRunState.RUNNING,ExperimentRunState.CANCELLED},
- ExperimentRunState.COMPLETED:{ExperimentRunState.ARCHIVED}, ExperimentRunState.FAILED:{ExperimentRunState.ARCHIVED}, ExperimentRunState.CANCELLED:{ExperimentRunState.ARCHIVED}, ExperimentRunState.ARCHIVED:set()}
+ ExperimentRunState.PAUSED:{ExperimentRunState.SCHEDULED,ExperimentRunState.RUNNING,ExperimentRunState.CANCELLED},
+ ExperimentRunState.COMPLETED:{ExperimentRunState.ARCHIVED}, ExperimentRunState.FAILED:{ExperimentRunState.SCHEDULED,ExperimentRunState.ARCHIVED}, ExperimentRunState.CANCELLED:{ExperimentRunState.ARCHIVED}, ExperimentRunState.ARCHIVED:set()}
 ATTEMPT_TRANSITIONS={
  TrialAttemptState.PLANNED:{TrialAttemptState.SCHEDULED,TrialAttemptState.CANCELLED}, TrialAttemptState.SCHEDULED:{TrialAttemptState.RUNNING,TrialAttemptState.CANCELLED},
  TrialAttemptState.RUNNING:{TrialAttemptState.SUCCEEDED,TrialAttemptState.FAILED,TrialAttemptState.CANCELLED}, TrialAttemptState.SUCCEEDED:{TrialAttemptState.ARCHIVED},TrialAttemptState.FAILED:{TrialAttemptState.ARCHIVED},TrialAttemptState.CANCELLED:{TrialAttemptState.ARCHIVED},TrialAttemptState.ARCHIVED:set()}

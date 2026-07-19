@@ -1,0 +1,165 @@
+{
+  "id": "c3e2d22a-c9b0-40c9-a8a8-f959e848b961",
+  "run_id": "a9a29b79-3cc0-40af-af0d-07b2b5e42248",
+  "specification": {
+    "id": "c4a418ce-d328-430c-bf6e-b650e279d80b",
+    "revision": 1,
+    "content_hash": "ef633a3c8ee0fa334452f1761ce8f5b41963fa98f27fd0be0045cf52106492e0"
+  },
+  "cohort_hash": "e5b86858d22f4a7d39e51621b2f6dd68bf42d434cb65c971350bdc17db924dcf",
+  "status": "completed",
+  "metrics": {
+    "counts": {
+      "executions": 10,
+      "status": {
+        "completed": 10
+      },
+      "duplicate_responses": 0
+    },
+    "response_length": {
+      "n": 10,
+      "unit": "characters",
+      "mean": 465.8,
+      "std": 24.371294590152573,
+      "missing": 0
+    },
+    "latency": {
+      "n": 10,
+      "unit": "milliseconds",
+      "mean": 21070.096319999902,
+      "std": 4733.27077418181,
+      "missing": 0
+    },
+    "completion_tokens": {
+      "n": 10,
+      "unit": "tokens",
+      "mean": 80,
+      "std": 0.0,
+      "missing": 0
+    },
+    "lexical": {
+      "unique_terms": 223,
+      "top_terms": [
+        [
+          "the",
+          39
+        ],
+        [
+          "to",
+          28
+        ],
+        [
+          "and",
+          27
+        ],
+        [
+          "of",
+          22
+        ],
+        [
+          "is",
+          18
+        ],
+        [
+          "a",
+          17
+        ],
+        [
+          "reproducibility",
+          16
+        ],
+        [
+          "that",
+          15
+        ],
+        [
+          "scientific",
+          14
+        ],
+        [
+          "or",
+          13
+        ],
+        [
+          "in",
+          12
+        ],
+        [
+          "research",
+          11
+        ],
+        [
+          "study",
+          10
+        ],
+        [
+          "researchers",
+          9
+        ],
+        [
+          "experiment",
+          9
+        ],
+        [
+          "can",
+          9
+        ],
+        [
+          "it",
+          8
+        ],
+        [
+          "are",
+          8
+        ],
+        [
+          "under",
+          8
+        ],
+        [
+          "as",
+          7
+        ]
+      ]
+    },
+    "conditions": {
+      "entropy_source_policy_counts": {
+        "prng|678777a7-34c0-4e62-a025-e1d7f5935cd6": 5,
+        "os_entropy|678777a7-34c0-4e62-a025-e1d7f5935cd6": 5
+      },
+      "disclosure": "Conditions include source and policy; model, prompt, runtime, and software differences must be inspected from provenance. A deterministic entropy stream does not by itself make provider generation deterministic."
+    },
+    "assumptions": [
+      "descriptive statistics only",
+      "executions may not be independent",
+      "provider seed support must be interpreted according to each execution's recorded capability snapshot; LM Studio is best-effort"
+    ]
+  },
+  "artifacts": [
+    {
+      "name": "result.json",
+      "content_hash": "a9eace6a1ca430543ed35c13ea6ce9b5ab4727ca3268c502cda897d371c38ad8",
+      "locator": "reports/artifacts/a9eace6a1ca430543ed35c13ea6ce9b5ab4727ca3268c502cda897d371c38ad8-result.json",
+      "media_type": "application/json",
+      "byte_size": 2107,
+      "created_at": "2026-07-19T01:35:12.929128Z",
+      "producer_id": "baseline_descriptive",
+      "producer_version": "1",
+      "retention_status": "retained"
+    },
+    {
+      "name": "report.md",
+      "content_hash": "ddcb5bbdc1cfd510a9bc97913c31201ca357fb87c2c0b766069420eba51e33f9",
+      "locator": "reports/artifacts/ddcb5bbdc1cfd510a9bc97913c31201ca357fb87c2c0b766069420eba51e33f9-report.md",
+      "media_type": "text/markdown",
+      "byte_size": 2153,
+      "created_at": "2026-07-19T01:35:12.929308Z",
+      "producer_id": "baseline_descriptive",
+      "producer_version": "1",
+      "retention_status": "retained"
+    }
+  ],
+  "error_category": null,
+  "error": null,
+  "finished_at": "2026-07-19T01:35:12.929381Z"
+}

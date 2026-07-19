@@ -61,6 +61,9 @@ CREATE TABLE IF NOT EXISTS trial_attempts (id TEXT PRIMARY KEY, experiment_run_i
 CREATE TABLE IF NOT EXISTS control_events (id TEXT PRIMARY KEY, experiment_run_id TEXT NOT NULL, trial_attempt_id TEXT, event_type TEXT NOT NULL, payload_json TEXT NOT NULL, occurred_at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_attempts_run ON trial_attempts(experiment_run_id);
 CREATE TABLE IF NOT EXISTS entropy_policy_specifications (id TEXT NOT NULL, revision INTEGER NOT NULL, content_hash TEXT NOT NULL, payload_json TEXT NOT NULL, PRIMARY KEY(id,revision));
+CREATE TABLE IF NOT EXISTS entropy_source_specifications (id TEXT NOT NULL, revision INTEGER NOT NULL, content_hash TEXT NOT NULL, payload_json TEXT NOT NULL, PRIMARY KEY(id,revision));
+CREATE TABLE IF NOT EXISTS prompt_revisions (id TEXT NOT NULL, revision INTEGER NOT NULL, content_hash TEXT NOT NULL, payload_json TEXT NOT NULL, PRIMARY KEY(id,revision));
+CREATE TABLE IF NOT EXISTS prompt_set_revisions (id TEXT NOT NULL, revision INTEGER NOT NULL, content_hash TEXT NOT NULL, payload_json TEXT NOT NULL, PRIMARY KEY(id,revision));
 CREATE TABLE IF NOT EXISTS analysis_specifications (id TEXT NOT NULL, revision INTEGER NOT NULL, content_hash TEXT NOT NULL, payload_json TEXT NOT NULL, PRIMARY KEY(id,revision));
 CREATE TABLE IF NOT EXISTS analysis_runs (id TEXT PRIMARY KEY, status TEXT NOT NULL, payload_json TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS analysis_results (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, status TEXT NOT NULL, payload_json TEXT NOT NULL);

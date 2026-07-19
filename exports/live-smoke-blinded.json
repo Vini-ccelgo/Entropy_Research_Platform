@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    {
+      "condition_hash": "2bf0884305c9614505db31698071e80066925f33f0a86311c5be80f563752b1a",
+      "condition_id": "control",
+      "label": "Condition A"
+    },
+    {
+      "condition_hash": "6f2d60c78f584b8ecdb66c82811c516a08fde1a1fb39e6046299bdd147903b49",
+      "condition_id": "os-entropy",
+      "label": "Condition B"
+    }
+  ],
+  "disclosure": "Blinded labels only; retain the reveal map separately until the planned analysis is complete.",
+  "experiment_revision": "8ed59838-eb36-48b9-83b8-3cf97ade44bc:1:ef13c1a075636bc21d2ff4cd8d61b0c2603ec40cef1d0b1890746fb176f6a89d"
+}

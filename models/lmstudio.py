@@ -34,10 +34,19 @@ class LmStudioProvider(ModelProvider):
             provider_configuration=configuration, provider_configuration_hash=canonical_hash(configuration),
         )
 
+    def preflight(self, model_identifier: str) -> dict[str, object]:
+        """Check local reachability without generating evidence or a response."""
+        response = httpx.get(f"{self._base_url}/models", timeout=min(self._timeout_s, 10.0))
+        response.raise_for_status()
+        identifiers = {item.get("id") for item in response.json().get("data", [])}
+        if model_identifier not in identifiers:
+            raise ValueError(f"LM Studio does not report configured model {model_identifier!r}")
+        return {"reachable": True, "model_reported": True, "seed": "best-effort"}
+
     def generate(self, request: ModelRequest) -> ModelResponse:
         payload: dict[str, Any] = {
             "model": request.model_identifier,
-            "messages": [{"role": "user", "content": request.prompt.text}],
+            "messages": [{"role": message.role.value, "content": message.content} for message in request.messages],
             "temperature": request.temperature,
             "top_p": request.top_p,
         }

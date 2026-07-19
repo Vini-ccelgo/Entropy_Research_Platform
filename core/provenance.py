@@ -13,7 +13,7 @@ from pydantic import Field
 
 from core.science import ScientificRecordReference, ScientificRecordType
 from core.types import (
-    EntropySample, FrozenModel, ModelRequest, ModelResponse, RenderedPrompt,
+    ChatMessage, EntropySample, FrozenModel, ModelRequest, ModelResponse, RenderedPrompt,
     TrialStatus, utc_now,
 )
 
@@ -63,6 +63,9 @@ class PromptSnapshot(FrozenModel):
     template_hash: str
     rendered_hash: str
     rendered_prompt: RenderedPrompt
+    category: str | None = None
+    purpose: str | None = None
+    metadata: dict[str, str] = Field(default_factory=dict)
 
 
 class EntropySourceSnapshot(FrozenModel):
@@ -124,6 +127,32 @@ class ExecutionProvenance(FrozenModel):
             raise ValueError("execution provenance must pin an experiment revision")
 
 
+class ConversationTurnEvidence(FrozenModel):
+    """Complete, immutable request lineage for one fixed conversation turn."""
+    trajectory_id: str
+    turn_index: int = Field(ge=1)
+    parent_slot_id: str | None = None
+    parent_execution_id: UUID | None = None
+    messages: tuple[ChatMessage, ...] = Field(min_length=1)
+    pre_context_transcript_hash: str = Field(min_length=64, max_length=64)
+    final_request_messages_hash: str = Field(min_length=64, max_length=64)
+    context_policy: str
+    context_window_budget: int = Field(ge=1)
+    estimated_context_tokens: int = Field(ge=0)
+    omitted_messages: tuple[str, ...] = ()
+    reconstruction_version: str
+
+    def model_post_init(self, __context: Any) -> None:
+        if self.context_policy != "reject_if_exceeds_budget":
+            raise ValueError("unsupported conversation context policy")
+        if (self.turn_index == 1) != (self.parent_slot_id is None):
+            raise ValueError("conversation parent slot must match turn index")
+        if self.parent_slot_id is None and self.parent_execution_id is not None:
+            raise ValueError("initial conversation turns cannot resolve a parent execution")
+        if self.omitted_messages:
+            raise ValueError("reject_if_exceeds_budget must not omit messages")
+
+
 class TrialExecution(FrozenModel):
     """An immutable, terminal record of one attempted trial execution."""
 
@@ -133,6 +162,10 @@ class TrialExecution(FrozenModel):
     attempt_number: int = Field(ge=1)
     idempotency_key: str = Field(min_length=1)
     trial_spec_id: UUID
+    condition_id: str | None = None
+    entropy_source_reference: "EntropySourceReference | None" = None
+    prompt_revision_reference: "PromptRevisionReference | None" = None
+    conversation: ConversationTurnEvidence | None = None
     status: TrialStatus
     provenance: ExecutionProvenance
     entropy: EntropySample | None = None
@@ -145,4 +178,5 @@ class TrialExecution(FrozenModel):
     finished_at: datetime | None = None
 
 from entropy.policy import EntropyApplication
+from core.registries import EntropySourceReference, PromptRevisionReference
 TrialExecution.model_rebuild()

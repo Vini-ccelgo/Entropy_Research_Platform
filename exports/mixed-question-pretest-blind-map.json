@@ -1,0 +1,14 @@
+{
+  "conditions": [
+    {
+      "blinded_label": "Condition A",
+      "condition_hash": "a9f5174c72af1e5ea882bddda82ba1f6f30bb1ae450e6d8ece5b75668f4b3cfe"
+    },
+    {
+      "blinded_label": "Condition B",
+      "condition_hash": "ebc8ce9ece9a49477d87a64e4ecb80efc475f39bab7c81069c15de437172aaf3"
+    }
+  ],
+  "disclosure": "Blinded labels only; retain the reveal map separately until the planned analysis is complete.",
+  "experiment_revision": "e1b8b19c-8b30-492d-94b4-b9b34b514be1:1:713094839e5b92494466e9ab9aa06b40e83076793c50db3cf69a69ff54f619ae"
+}

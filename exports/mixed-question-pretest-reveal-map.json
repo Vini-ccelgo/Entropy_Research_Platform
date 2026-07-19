@@ -1,0 +1,7 @@
+{
+  "experiment_revision": "e1b8b19c-8b30-492d-94b4-b9b34b514be1:1:713094839e5b92494466e9ab9aa06b40e83076793c50db3cf69a69ff54f619ae",
+  "reveal_map": {
+    "Condition A": "Deterministic PRNG control",
+    "Condition B": "Operating-system entropy"
+  }
+}

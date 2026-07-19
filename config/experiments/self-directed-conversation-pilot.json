@@ -1,0 +1,17 @@
+{
+  "author_id": "11111111-1111-4111-8111-111111111111",
+  "author_name": "Local Researcher",
+  "hypothesis": {"title": "Self-directed fixed-continuation conversation pilot", "statement": "This pilot records fixed-instruction conversation trajectories across matched entropy conditions.", "null_statement": "No scientific effect is established by this pilot.", "success_criteria": "Complete, reconstructable six-turn trajectories under each registered condition."},
+  "entropy_policy": {"algorithm": "derive_model_seed", "algorithm_version": "1", "byte_start": 0, "byte_length": 8, "byte_order": "big", "target_field": "seed"},
+  "entropy_sources": [
+    {"name": "control", "implementation_identity": "entropy.prng.PrngEntropySource", "implementation_version": "python-stdlib", "source_type": "deterministic_prng", "configuration": {"seed": 20260719}, "declared_capabilities": {"max_bytes_per_request": 1048576, "replayable": true}},
+    {"name": "os", "implementation_identity": "entropy.hardware.OperatingSystemEntropySource", "implementation_version": "python-stdlib", "source_type": "os_entropy", "configuration": {"api": "os.urandom", "note": "Operating-system entropy; not a claim of specialised hardware randomness."}, "declared_capabilities": {"max_bytes_per_request": 1048576, "replayable": false}}
+  ],
+  "prompts": [
+    {"name": "initial", "category": "conversation", "purpose": "fixed initial conversation instruction", "content": "Choose any subject you consider worth discussing and begin.", "tags": ["conversation-pilot", "fixed-instruction"]},
+    {"name": "continuation", "category": "conversation", "purpose": "fixed continuation conversation instruction", "content": "Continue in whichever direction you choose.", "tags": ["conversation-pilot", "fixed-instruction"]}
+  ],
+  "experiment": {"name": "Self-directed conversation pilot", "description": "Fixed initial and continuation instructions; prior assistant responses are retained only as assistant chat messages. LM Studio seed support is best-effort.", "model_provider": "lmstudio", "model_identifier": "dolphin3.0-llama3.1-8b", "allocation_kind": "fixed_conversation", "assignment_seed": 20260719, "temperature": 0.9, "top_p": 0.95, "max_tokens": 256, "request_timeout_seconds": 240, "conversation": {"trajectories_per_condition": 2, "turns_per_trajectory": 6, "initial_prompt": "initial", "continuation_prompt": "continuation", "context_policy": "reject_if_exceeds_budget", "context_window_budget": 8192}, "conditions": [{"id": "control", "label": "Deterministic PRNG control", "blinded_label": "Condition A", "source": "control"}, {"id": "os-entropy", "label": "Operating-system entropy", "blinded_label": "Condition B", "source": "os"}]},
+  "lmstudio": {"base_url": "http://127.0.0.1:1234/v1", "timeout_s": 240},
+  "model_artifact_hashes": {"dolphin3.0-llama3.1-8b": "a7f0539a32e5048aca2e03276e224a5de1bad1a907381608876b88eed7ce80ae"}
+}

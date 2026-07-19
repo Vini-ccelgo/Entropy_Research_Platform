@@ -2,6 +2,12 @@
 
 **Status:** canonical description of the implementation as of Milestones 0–3.
 
+The local overnight MVP supplements this specification with registered entropy
+sources, registered prompt/prompt-set revisions, balanced condition assignment,
+local CLI preflight, blind export, and a localhost-only workspace. See
+[Local Overnight MVP](local-overnight-mvp.md) for the normative operational
+workflow.
+
 ## Purpose and admission criterion
 
 The platform is a Python research framework for controlled LLM experiments. It

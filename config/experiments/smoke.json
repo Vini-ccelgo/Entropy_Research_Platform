@@ -1,0 +1,36 @@
+{
+  "author_id": "11111111-1111-4111-8111-111111111111",
+  "author_name": "Local Researcher",
+  "hypothesis": {
+    "title": "Smoke validation of entropy-condition provenance",
+    "statement": "The local MVP records a complete, auditable execution under both registered entropy conditions.",
+    "null_statement": "This smoke run does not establish a scientific effect.",
+    "success_criteria": "Complete ten balanced trial slots with complete provenance and a resumable interruption."
+  },
+  "entropy_policy": {"algorithm": "derive_model_seed", "algorithm_version": "1", "byte_start": 0, "byte_length": 8, "byte_order": "big", "target_field": "seed"},
+  "entropy_sources": [
+    {"name": "control", "implementation_identity": "entropy.prng.PrngEntropySource", "implementation_version": "python-stdlib", "source_type": "deterministic_prng", "configuration": {"seed": 20260716}, "declared_capabilities": {"max_bytes_per_request": 1048576, "replayable": true}},
+    {"name": "os", "implementation_identity": "entropy.hardware.OperatingSystemEntropySource", "implementation_version": "python-stdlib", "source_type": "os_entropy", "configuration": {"api": "os.urandom", "note": "Operating-system entropy; not a claim of specialised hardware randomness."}, "declared_capabilities": {"max_bytes_per_request": 1048576, "replayable": false}}
+  ],
+  "prompts": [
+    {"category": "neutral", "purpose": "neutral live-validation prompt", "content": "Explain the following concept clearly in two short paragraphs: {topic}", "variable_schema": ["topic"], "tags": ["neutral", "live-validation"]}
+  ],
+  "experiment": {
+    "name": "Local MVP live smoke validation",
+    "description": "Balanced five-per-condition live validation. The deterministic control is the reproducible PRNG entropy stream and derived-seed sequence, not a guarantee of identical LM Studio outputs; LM Studio seed support is best-effort.",
+    "model_provider": "lmstudio",
+    "model_identifier": "dolphin3.0-llama3.1-8b",
+    "trials_per_condition": 5,
+    "assignment_seed": 20260718,
+    "temperature": 0.9,
+    "top_p": 0.95,
+    "max_tokens": 80,
+    "prompt_variables": {"topic": "the role of reproducibility in scientific research"},
+    "conditions": [
+      {"id": "control", "label": "Deterministic PRNG control", "blinded_label": "Condition A", "source": "control"},
+      {"id": "os-entropy", "label": "Operating-system entropy", "blinded_label": "Condition B", "source": "os"}
+    ]
+  },
+  "lmstudio": {"base_url": "http://127.0.0.1:1234/v1", "timeout_s": 120},
+  "model_artifact_hashes": {"dolphin3.0-llama3.1-8b": "a7f0539a32e5048aca2e03276e224a5de1bad1a907381608876b88eed7ce80ae"}
+}

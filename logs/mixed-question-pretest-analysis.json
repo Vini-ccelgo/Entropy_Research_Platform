@@ -1,0 +1,683 @@
+{
+  "id": "329502ea-7f9d-40fe-8f4a-4459e6a7fcd0",
+  "run_id": "e25c934b-36de-491c-8c59-57f48be5926a",
+  "specification": {
+    "id": "e2a4a4f3-50cd-4feb-bd7c-a898f9828cd2",
+    "revision": 1,
+    "content_hash": "ef633a3c8ee0fa334452f1761ce8f5b41963fa98f27fd0be0045cf52106492e0"
+  },
+  "cohort_hash": "0b3d2090acf066a5a0bfc149e0ca7cc9c9e440c3c9bfa0335d84191a04fb70ea",
+  "status": "completed",
+  "metrics": {
+    "counts": {
+      "executions": 23,
+      "status": {
+        "completed": 22,
+        "failed": 1
+      },
+      "duplicate_responses": 0
+    },
+    "response_length": {
+      "n": 22,
+      "unit": "characters",
+      "mean": 1015.6363636363636,
+      "std": 761.4470999028188,
+      "missing": 1
+    },
+    "latency": {
+      "n": 22,
+      "unit": "milliseconds",
+      "mean": 97861.83733936369,
+      "std": 75003.94874390616,
+      "missing": 1
+    },
+    "completion_tokens": {
+      "n": 22,
+      "unit": "tokens",
+      "mean": 192.4090909090909,
+      "std": 141.67718077982428,
+      "missing": 1
+    },
+    "lexical": {
+      "unique_terms": 1300,
+      "top_terms": [
+        [
+          "and",
+          148
+        ],
+        [
+          "the",
+          113
+        ],
+        [
+          "to",
+          93
+        ],
+        [
+          "of",
+          77
+        ],
+        [
+          "a",
+          75
+        ],
+        [
+          "in",
+          56
+        ],
+        [
+          "or",
+          47
+        ],
+        [
+          "can",
+          44
+        ],
+        [
+          "that",
+          34
+        ],
+        [
+          "is",
+          32
+        ],
+        [
+          "as",
+          32
+        ],
+        [
+          "are",
+          27
+        ],
+        [
+          "you",
+          27
+        ],
+        [
+          "on",
+          27
+        ],
+        [
+          "be",
+          26
+        ],
+        [
+          "your",
+          26
+        ],
+        [
+          "for",
+          25
+        ],
+        [
+          "sleep",
+          19
+        ],
+        [
+          "it",
+          17
+        ],
+        [
+          "heat",
+          16
+        ]
+      ]
+    },
+    "conditions": {
+      "entropy_source_policy_counts": {
+        "os_entropy|3a7eaeb0-8bec-4531-a5dd-e8f7fe2bccec": 12,
+        "prng|3a7eaeb0-8bec-4531-a5dd-e8f7fe2bccec": 11
+      },
+      "by_prompt_and_condition": {
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=dc2b07d4-164f-463f-8b98-fe913813669c": {
+          "n": 2,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 2,
+            "unit": "characters",
+            "mean": 1074.5,
+            "std": 506.5,
+            "missing": 21
+          },
+          "completion_tokens": {
+            "n": 2,
+            "unit": "tokens",
+            "mean": 223,
+            "std": 103.0,
+            "missing": 21
+          },
+          "latency": {
+            "n": 2,
+            "unit": "milliseconds",
+            "mean": 135497.57156550005,
+            "std": 39638.122366499374,
+            "missing": 21
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=595fb83a-850f-4911-b0e8-de9ed587ee28": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 509,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 118,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 62209.10583799923,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=fd0963f5-0058-4628-a215-900fac46774f": {
+          "n": 2,
+          "missing_responses": 1,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 2717,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 512,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 283801.97690000024,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 1,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=a4ced930-e6f2-42fb-8572-ca31ecb438b6": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 691,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 134,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 69962.08070299872,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=control|prompt=2bd4de98-afe9-4e45-a8d3-d37f967a111e": {
+          "n": 2,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 2,
+            "unit": "characters",
+            "mean": 1620.5,
+            "std": 130.5,
+            "missing": 21
+          },
+          "completion_tokens": {
+            "n": 2,
+            "unit": "tokens",
+            "mean": 302.5,
+            "std": 38.5,
+            "missing": 21
+          },
+          "latency": {
+            "n": 2,
+            "unit": "milliseconds",
+            "mean": 195082.55061899943,
+            "std": 33145.496660999925,
+            "missing": 21
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=control|prompt=fd0963f5-0058-4628-a215-900fac46774f": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 1858,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 346,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 136973.7520200033,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=control|prompt=7b6da38f-3c96-422b-9dd4-86701f13c57a": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 879,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 167,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 68232.22676200021,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=05057260-a04b-4966-a42e-0d12c40ef263": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 507,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 85,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 41612.787242000195,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=control|prompt=595fb83a-850f-4911-b0e8-de9ed587ee28": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 198,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 37,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 20390.723509000964,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=control|prompt=05057260-a04b-4966-a42e-0d12c40ef263": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 558,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 103,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 41583.022259001154,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=897745fe-ce39-4eba-9c49-1a17ef9662b2": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 256,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 50,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 23294.761307000954,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=os-entropy|prompt=5e3b812a-bd96-493f-995e-df401fcb870b": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 2786,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 512,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 223142.5095679988,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=control|prompt=3305c863-8049-4352-a1f8-86724ecb679b": {
+          "n": 2,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 2,
+            "unit": "characters",
+            "mean": 833,
+            "std": 55.0,
+            "missing": 21
+          },
+          "completion_tokens": {
+            "n": 2,
+            "unit": "tokens",
+            "mean": 158,
+            "std": 11.0,
+            "missing": 21
+          },
+          "latency": {
+            "n": 2,
+            "unit": "milliseconds",
+            "mean": 61507.649275499716,
+            "std": 1913.2488915020076,
+            "missing": 21
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=control|prompt=3cc1ad39-9b34-4d91-bc7e-5a0cd1834913": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 415,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 84,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 39540.76782199991,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=e866b4d7-fb16-4015-9b4a-f6988a016228": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 1959,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 358,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 173000.3039309995,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=control|prompt=dc2b07d4-164f-463f-8b98-fe913813669c": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 131,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 28,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 11935.56931800049,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=minimally_constrained_questions|condition=os-entropy|prompt=3cc1ad39-9b34-4d91-bc7e-5a0cd1834913": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 470,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 89,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 51448.91605900011,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=os-entropy|prompt=3305c863-8049-4352-a1f8-86724ecb679b": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 721,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 134,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 67505.74027099901,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        },
+        "group=simple_constrained_controls|condition=control|prompt=5e3b812a-bd96-493f-995e-df401fcb870b": {
+          "n": 1,
+          "missing_responses": 0,
+          "response_length": {
+            "n": 1,
+            "unit": "characters",
+            "mean": 633,
+            "std": 0,
+            "missing": 22
+          },
+          "completion_tokens": {
+            "n": 1,
+            "unit": "tokens",
+            "mean": 109,
+            "std": 0,
+            "missing": 22
+          },
+          "latency": {
+            "n": 1,
+            "unit": "milliseconds",
+            "mean": 54150.63503700003,
+            "std": 0,
+            "missing": 22
+          },
+          "failures": 0,
+          "duplicates": 0
+        }
+      },
+      "conversation_by_condition_and_turn": {},
+      "disclosure": "Conditions include source and policy; model, prompt, runtime, and software differences must be inspected from provenance. A deterministic entropy stream does not by itself make provider generation deterministic."
+    },
+    "assumptions": [
+      "descriptive statistics only",
+      "executions may not be independent",
+      "conversation turns from one trajectory are dependent observations",
+      "provider seed support must be interpreted according to each execution's recorded capability snapshot; LM Studio is best-effort"
+    ]
+  },
+  "artifacts": [
+    {
+      "name": "result.json",
+      "content_hash": "4cbf7daa66fd53ad484d00ce56881038e95fcaac3b70aa1230ae746ed25f1846",
+      "locator": "reports/artifacts/4cbf7daa66fd53ad484d00ce56881038e95fcaac3b70aa1230ae746ed25f1846-result.json",
+      "media_type": "application/json",
+      "byte_size": 15537,
+      "created_at": "2026-07-19T07:40:17.381523Z",
+      "producer_id": "baseline_descriptive",
+      "producer_version": "1",
+      "retention_status": "retained"
+    },
+    {
+      "name": "report.md",
+      "content_hash": "24fa524e080839c2731ee0651eebbee31a468ed4e7a794e7e049e614776cdcae",
+      "locator": "reports/artifacts/24fa524e080839c2731ee0651eebbee31a468ed4e7a794e7e049e614776cdcae-report.md",
+      "media_type": "text/markdown",
+      "byte_size": 15583,
+      "created_at": "2026-07-19T07:40:17.381858Z",
+      "producer_id": "baseline_descriptive",
+      "producer_version": "1",
+      "retention_status": "retained"
+    }
+  ],
+  "error_category": null,
+  "error": null,
+  "finished_at": "2026-07-19T07:40:17.381992Z"
+}

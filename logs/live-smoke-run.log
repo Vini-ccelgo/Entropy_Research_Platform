@@ -1,0 +1,24 @@
+{
+  "id": "15deca0a-eba9-4caa-a5ba-9b32cdc542da",
+  "experiment_revision": {
+    "record_type": "experiment",
+    "record_id": "8ed59838-eb36-48b9-83b8-3cf97ade44bc",
+    "revision": 1,
+    "content_hash": "ef13c1a075636bc21d2ff4cd8d61b0c2603ec40cef1d0b1890746fb176f6a89d"
+  },
+  "idempotency_key": "live-smoke-20260718",
+  "command_hash": "a04857f65bbc33b01b2996e351cdd06d7b118c2f2511f5a40b4f760e0c412651",
+  "retry_policy": {
+    "max_attempts": 1,
+    "retryable": [
+      "transient",
+      "provider"
+    ],
+    "backoff_seconds": 0.0
+  },
+  "scheduler_name": "inline",
+  "created_by": "11111111-1111-4111-8111-111111111111",
+  "state": "completed",
+  "created_at": "2026-07-19T01:13:16.401986Z",
+  "updated_at": "2026-07-19T01:16:47.426995Z"
+}

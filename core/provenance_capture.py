@@ -33,11 +33,13 @@ def capture_software_snapshot(application_version: str, dependency_manifest: Pat
     )
 
 
-def snapshot_prompt(template: PromptTemplate, rendered: RenderedPrompt) -> PromptSnapshot:
+def snapshot_prompt(template: PromptTemplate, rendered: RenderedPrompt, *, category: str | None = None,
+                    purpose: str | None = None, metadata: dict[str, str] | None = None) -> PromptSnapshot:
     return PromptSnapshot(
         template_id=template.id, template_version=template.version,
         template_hash=canonical_hash(template.model_dump(mode="json")),
         rendered_hash=canonical_hash(rendered.model_dump(mode="json")), rendered_prompt=rendered,
+        category=category, purpose=purpose, metadata=metadata or {},
     )
 
 

@@ -1,0 +1,24 @@
+{
+  "id": "5f0562bc-9133-4d9d-9d99-0549b9df566d",
+  "experiment_revision": {
+    "record_type": "experiment",
+    "record_id": "f034f23f-5fef-44ce-b00f-cf79398182e1",
+    "revision": 1,
+    "content_hash": "5a7780c63e608580941ed4d3ea6b4aaa2f1989fa15fe8ac885cbe7893ecd4a1c"
+  },
+  "idempotency_key": "conversation-reduced-live",
+  "command_hash": "717e3ddfbc2be4af7d376d9986902b34bcdffe1274f686f71a91d558ef980cd5",
+  "retry_policy": {
+    "max_attempts": 1,
+    "retryable": [
+      "transient",
+      "provider"
+    ],
+    "backoff_seconds": 0.0
+  },
+  "scheduler_name": "inline",
+  "created_by": "11111111-1111-4111-8111-111111111111",
+  "state": "completed",
+  "created_at": "2026-07-19T03:14:59.126789Z",
+  "updated_at": "2026-07-19T03:18:53.245216Z"
+}

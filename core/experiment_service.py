@@ -9,8 +9,10 @@ from core.control import (
     RetryPolicy, TrialAttempt, TrialAttemptState,
 )
 from core.interfaces import ControlRepositoryPort, ScientificRecordRepositoryPort
-from core.provenance import canonical_hash
+from core.provenance import ExecutionProvenance, TrialExecution, canonical_hash
+from core.provenance_capture import execution_artifacts
 from core.science import ExperimentRevision
+from core.types import TrialStatus, utc_now
 from runner.scheduler import Scheduler
 
 
@@ -46,6 +48,53 @@ class ExperimentService:
                                             self._event(ControlEventType.CANCELLATION_REQUESTED, run_id,
                                                         from_state=run.state, to_state=ExperimentRunState.CANCELLED))
 
+    def pause(self, run_id: UUID) -> ExperimentRun:
+        run = self._control.get_run(run_id)
+        return self._control.transition_run(run_id, ExperimentRunState.PAUSED,
+            self._event(ControlEventType.STATE_CHANGED, run_id, from_state=run.state, to_state=ExperimentRunState.PAUSED))
+
+    def resume(self, experiment: ExperimentRevision, run_id: UUID) -> ExperimentRun:
+        run = self._control.get_run(run_id)
+        if run.experiment_revision != experiment.reference():
+            raise ValueError("run cannot be resumed with a different experiment revision")
+        if run.state not in {ExperimentRunState.PAUSED, ExperimentRunState.FAILED, ExperimentRunState.SCHEDULED}:
+            raise ValueError("only paused, failed, or scheduled runs may be resumed")
+        run = self._control.transition_run(run_id, ExperimentRunState.SCHEDULED,
+            self._event(ControlEventType.STATE_CHANGED, run_id, from_state=run.state, to_state=ExperimentRunState.SCHEDULED))
+        self._scheduler.submit(lambda: self._run(experiment, run))
+        return self._control.get_run(run_id)
+
+    def reconcile_interrupted(self, run_id: UUID) -> ExperimentRun:
+        """Close attempts stranded by a known process interruption, atomically."""
+        run = self._control.get_run(run_id)
+        if run.state is not ExperimentRunState.RUNNING:
+            return run
+        experiment = self._records.resolve_scientific_record(run.experiment_revision)
+        attempts = self._control.attempts_for_run(run_id)
+        for attempt in attempts:
+            if attempt.state is not TrialAttemptState.RUNNING:
+                continue
+            execution = TrialExecution(
+                experiment_run_id=run.id, trial_attempt_id=attempt.id, attempt_number=attempt.attempt_number,
+                idempotency_key=attempt.idempotency_key, trial_spec_id=attempt.trial_spec_id,
+                status=TrialStatus.FAILED,
+                provenance=ExecutionProvenance(experiment_revision=experiment.reference(),
+                    artifacts=execution_artifacts(None, None, None, None, None, experiment.reference().content_hash),
+                    unavailable_components={"execution": "Process interruption occurred before terminal evidence could be captured."}),
+                error="Execution interrupted by process restart; no provider outcome was recorded.",
+                failure_category=ErrorCategory.INTERRUPTED.value, finished_at=utc_now(),
+            )
+            self._control.finalize_attempt(execution, TrialAttemptState.FAILED,
+                self._event(ControlEventType.FAILURE_RECORDED, run.id, attempt.id,
+                    TrialAttemptState.RUNNING, TrialAttemptState.FAILED,
+                    {"reconciliation": "process_restart"}), ErrorCategory.INTERRUPTED, execution.error)
+        current = self._control.get_run(run_id)
+        if current.state is ExperimentRunState.RUNNING:
+            return self._control.transition_run(run_id, ExperimentRunState.FAILED,
+                self._event(ControlEventType.STATE_CHANGED, run_id, from_state=current.state,
+                    to_state=ExperimentRunState.FAILED, details={"reconciliation": "process_restart"}))
+        return current
+
     def _run(self, experiment: ExperimentRevision, initial: ExperimentRun) -> None:
         run = self._control.get_run(initial.id)
         if run.state is ExperimentRunState.CANCELLED:
@@ -53,12 +102,33 @@ class ExperimentService:
         run = self._control.transition_run(run.id, ExperimentRunState.RUNNING,
                                            self._event(ControlEventType.STATE_CHANGED, run.id,
                                                        from_state=run.state, to_state=ExperimentRunState.RUNNING))
-        failed = False
-        for trial in experiment.plan.trials:
-            if self._control.get_run(run.id).state is ExperimentRunState.CANCELLED:
-                return
-            if not self._execute_with_retries(experiment, run, trial):
+        attempts = list(self._control.attempts_for_run(run.id))
+        terminal_trial_specs = {attempt.trial_spec_id for attempt in attempts if attempt.state in {TrialAttemptState.SUCCEEDED, TrialAttemptState.FAILED, TrialAttemptState.CANCELLED}}
+        failed = any(attempt.state in {TrialAttemptState.FAILED, TrialAttemptState.CANCELLED} for attempt in attempts)
+        pending = [trial for trial in experiment.plan.trials if trial.id not in terminal_trial_specs]
+        by_slot = {trial.slot_id: trial for trial in experiment.plan.trials}
+        while pending:
+            progressed = False
+            for trial in list(pending):
+                state = self._control.get_run(run.id).state
+                if state in {ExperimentRunState.CANCELLED, ExperimentRunState.PAUSED}:
+                    return
+                parent_slot = trial.conversation.parent_slot_id if trial.conversation else None
+                if parent_slot:
+                    parent = by_slot.get(parent_slot)
+                    if parent is None:
+                        raise ValueError("conversation trial references an unknown parent slot")
+                    if parent.id not in self._control.successful_trial_specs(run.id):
+                        continue
+                if not self._execute_with_retries(experiment, run, trial):
+                    failed = True
+                pending.remove(trial)
+                progressed = True
+                break
+            if not progressed:
+                # A failed or unavailable parent deliberately blocks descendants.
                 failed = True
+                break
         run = self._control.get_run(run.id)
         if run.state is ExperimentRunState.RUNNING:
             target = ExperimentRunState.FAILED if failed else ExperimentRunState.COMPLETED
@@ -68,7 +138,10 @@ class ExperimentService:
 
     def _execute_with_retries(self, experiment: ExperimentRevision, run: ExperimentRun, trial) -> bool:
         predecessor = None
-        for number in range(1, run.retry_policy.max_attempts + 1):
+        existing = [attempt for attempt in self._control.attempts_for_run(run.id) if attempt.trial_spec_id == trial.id]
+        start_number = len(existing) + 1
+        predecessor = existing[-1].id if existing else None
+        for number in range(start_number, run.retry_policy.max_attempts + 1):
             attempt = TrialAttempt(experiment_run_id=run.id, trial_spec_id=trial.id, attempt_number=number,
                                    idempotency_key=f"{run.id}:{trial.id}:{number}", predecessor_attempt_id=predecessor)
             attempt = self._control.create_attempt(attempt, self._event(ControlEventType.ATTEMPT_CREATED, run.id, attempt.id, to_state=attempt.state))
